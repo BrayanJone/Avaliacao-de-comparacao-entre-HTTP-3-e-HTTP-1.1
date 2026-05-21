@@ -2,45 +2,48 @@ import requests
 import time
 import csv
 import statistics
+import urllib3
 
-URL = "http://localhost:8000/arquivo.txt"
+urllib3.disable_warnings()
 
-perda = input("Informe a porcentagem de perda (0, 1, 5): ")
+URLS = [
+    "https://localhost:8443/livros/livro1.txt",
+    "https://localhost:8443/livros/livro2.txt",
+    "https://localhost:8443/livros/livro3.txt",
+    "https://localhost:8443/livros/livro4.txt",
+    "https://localhost:8443/livros/livro5.txt"
+]
+
+perda = input("Informe o cenário de perda (0, 3, 7): ")
 
 arquivo = f"../results/http1_{perda}.csv"
 
 tempos = []
 
 with open(arquivo, "w", newline="") as file:
-
     writer = csv.writer(file)
+    writer.writerow(["teste", "livro", "tempo_ms"])
 
-    writer.writerow(["teste", "tempo_ms"])
+    for i in range(20):
+        for url in URLS:
+            inicio = time.time()
 
-    for i in range (100):
+            r = requests.get(url, verify=False)
 
-        inicio = time.time()
+            fim = time.time()
 
-        r = requests.get(URL)
+            tempo_ms = (fim - inicio) * 1000
+            tempos.append(tempo_ms)
 
-        fim = time.time()
+            livro = url.split("/")[-1]
 
-        tempo_ms = (fim - inicio) * 1000
+            writer.writerow([i + 1, livro, tempo_ms])
 
-        tempos.append(tempo_ms)
-
-        writer.writerow([i + 1, tempo_ms])
-
-        print(f"Teste {i+1}: {tempo_ms:.2f} ms")
+            print(f"Teste {i+1} - {livro}: {tempo_ms:.2f} ms")
 
 media = sum(tempos) / len(tempos)
-
 desvio = statistics.stdev(tempos)
 
-
 print(f"\nMédia: {media:.2f} ms")
-
 print(f"Desvio padrão: {desvio:.2f} ms")
-
-print(f"\nResultados salvos em: {arquivo}")
-
+print(f"Resultados salvos em: {arquivo}")
