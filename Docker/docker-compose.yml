@@ -1,0 +1,44 @@
+services:
+
+  servidor:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    container_name: servidor-http
+
+    ports:
+      - "443:443/tcp"
+      - "443:443/udp"
+      - "8443:8443/tcp"
+
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./:/usr/share/caddy
+
+    cap_add:
+      - NET_ADMIN
+
+    networks:
+      - rede-http
+
+  cliente:
+    build:
+      context: ..
+      dockerfile: Docker/Dockerfile.client
+
+    container_name: cliente-http
+
+    tty: true
+
+    volumes:
+      - ../:/app
+
+    cap_add:
+      - NET_ADMIN
+
+    networks:
+      - rede-http
+
+networks:
+  rede-http:
+    driver: bridge

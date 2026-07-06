@@ -1,0 +1,5 @@
+FROM caddy:2
+
+# adiciona o 'tc' (iproute2), necessário pra aplicar netem (delay/loss)
+# direto no container do servidor (imagem base é Alpine, por isso apk)
+RUN apk add --no-cache iproute2

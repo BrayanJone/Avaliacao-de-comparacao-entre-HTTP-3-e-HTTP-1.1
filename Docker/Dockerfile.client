@@ -1,0 +1,16 @@
+FROM python:3.11-slim
+
+# build-essential/libssl-dev: necessários pra compilar as deps do aioquic
+# iproute2: fornece o binário 'tc', caso você prefira aplicar netem
+#           dentro do próprio container cliente também
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        build-essential \
+        libssl-dev \
+        pkg-config \
+        iproute2 \
+        curl \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --no-cache-dir requests aioquic pandas matplotlib
+
+WORKDIR /app

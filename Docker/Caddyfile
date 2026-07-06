@@ -1,12 +1,26 @@
-https://localhost:443 {
+# Caddyfile ajustado para o docker-compose.yml enviado
+# (serviço "servidor", volume ./ montado em /usr/share/caddy)
+#
+# Porta 8443 -> força HTTP/1.1 (nada de h2/h3 aqui, pra isolar o protocolo)
+# Porta 443  -> HTTP/3 (h3), com fallback h1/h2 caso precise depurar
+
+{
+    servers :8443 {
+        protocols h1
+    }
+    servers :443 {
+        protocols h1 h2 h3
+    }
+}
+
+servidor:8443 {
     tls internal
     root * /usr/share/caddy
     file_server
 }
 
-https://localhost:8443 {
+servidor:443 {
     tls internal
     root * /usr/share/caddy
     file_server
 }
-  
